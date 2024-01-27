@@ -1,0 +1,42 @@
+function ListaHistoricoAfastamento() {
+        $('#LoaderCarregandoHist').css({ display: 'block' });
+        $('#DivNaoRegistroAfastamento').css({ display: 'none' });
+        $.ajaxSetup({ cache: false });
+        $("#gridTableHistorico").hide();
+        slide = false;
+
+        $.getJSON("@Url.Action("ListaHistoricoAfastamento")", { re: $("#ReInteressadoTextBox").val() }, function sucess(data) {
+
+            if (data.isRedirect == true) {
+                window.location.href = data.redirectUrl;
+            }
+
+            if (data.length > 0) {
+                var arrayTable = new Array();
+                var arrayRow = new Array();
+                $('#TableHistorico').dataTable().fnClearTable();
+
+                for (var i = 0; i < data.length; i++) {
+                    var motivo = data[i].DescricaoMotivo;
+                    var cid = data[i].CodigoCid;
+                    var restricao = data[i].DescricaoRestricao.substring(3, data[i].DescricaoRestricao.length);
+                    var dias = data[i].DiasAfastamento;
+                    var dataAfast = data[i].DataInicioLicenca;
+
+                    arrayRow[i] = new Array(motivo, cid, restricao, dias, dataAfast);
+                }
+                arrayTable = arrayRow;
+                $('#TableHistorico').dataTable().fnAddData(arrayTable);
+
+                if (!slide) {
+                    $("#gridTableHistorico").slideToggle('slow');
+                    slide = true;
+                }
+            }
+            else {
+                $("#gridTableHistorico").hide();
+                $('#DivNaoRegistroAfastamento').css({ display: 'block' });
+            }
+            $('#LoaderCarregandoHist').css({ display: 'none' });
+        });
+    }
